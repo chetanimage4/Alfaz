@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, X, Save } from 'lucide-react';
 import { fetchShayaris, createShayari, updateShayari, deleteShayari } from '@/lib/api';
 import type { Shayari } from '@/types';
 import { LoadingScreen } from '@/components/States';
+import { useToast } from '@/components/ToastProvider';
 
 export function AdminShayaris() {
   const [items, setItems] = useState<Shayari[]>([]);
@@ -10,6 +11,7 @@ export function AdminShayaris() {
   const [editing, setEditing] = useState<Shayari | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', author: '', category: '' });
+  const { toast } = useToast();
 
   const load = async () => {
     try {
@@ -22,9 +24,7 @@ export function AdminShayaris() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const openNew = () => {
     setEditing(null);
@@ -54,6 +54,7 @@ export function AdminShayaris() {
           author: form.author || null,
           category: form.category || null,
         });
+        toast('Shayari updated.', 'success');
       } else {
         await createShayari({
           title: form.title || null,
@@ -61,21 +62,19 @@ export function AdminShayaris() {
           author: form.author || null,
           category: form.category || null,
         });
+        toast('Shayari created.', 'success');
       }
       setShowForm(false);
       await load();
     } catch {
-      // keep form open
+      toast('Could not save shayari.', 'error');
     }
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this shayari?')) return;
-    try {
-      await deleteShayari(id);
-      await load();
-    } catch {
-      // ignore
+    try { await deleteShayari(id); await load(); toast('Shayari deleted.', 'info'); } catch {
+      toast('Could not delete shayari.', 'error');
     }
   };
 
@@ -84,23 +83,15 @@ export function AdminShayaris() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-xl text-amber-300 tracking-wide">
-          Shayaris ({items.length})
-        </h2>
-        <button onClick={openNew} className="vintage-btn">
-          <Plus className="w-4 h-4" /> New Shayari
-        </button>
+        <h2 className="font-display text-xl text-amber-300 tracking-wide">Shayaris ({items.length})</h2>
+        <button onClick={openNew} className="vintage-btn"><Plus className="w-4 h-4" /> New Shayari</button>
       </div>
 
       {showForm && (
         <form onSubmit={save} className="vintage-paper p-6 mb-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg text-stone-800 tracking-wide">
-              {editing ? 'Edit Shayari' : 'New Shayari'}
-            </h3>
-            <button type="button" onClick={() => setShowForm(false)} className="text-stone-500 hover:text-stone-800">
-              <X className="w-5 h-5" />
-            </button>
+            <h3 className="font-display text-lg text-stone-800 tracking-wide">{editing ? 'Edit Shayari' : 'New Shayari'}</h3>
+            <button type="button" onClick={() => setShowForm(false)} className="text-stone-500 hover:text-stone-800"><X className="w-5 h-5" /></button>
           </div>
           <div>
             <label className="font-display text-xs tracking-wider uppercase text-amber-700/70 block mb-1">Title</label>
@@ -120,9 +111,7 @@ export function AdminShayaris() {
               <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="vintage-input" />
             </div>
           </div>
-          <button type="submit" className="vintage-btn">
-            <Save className="w-4 h-4" /> Save
-          </button>
+          <button type="submit" className="vintage-btn"><Save className="w-4 h-4" /> Save</button>
         </form>
       )}
 
@@ -138,18 +127,12 @@ export function AdminShayaris() {
               </div>
             </div>
             <div className="flex gap-2 flex-shrink-0">
-              <button onClick={() => openEdit(item)} className="p-2 text-amber-700 hover:bg-amber-700/10 transition-colors">
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button onClick={() => remove(item.id)} className="p-2 text-red-700 hover:bg-red-700/10 transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <button onClick={() => openEdit(item)} className="p-2 text-amber-700 hover:bg-amber-700/10 transition-colors"><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => remove(item.id)} className="p-2 text-red-700 hover:bg-red-700/10 transition-colors"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
-        {items.length === 0 && (
-          <p className="font-hand text-xl text-amber-200/40 text-center py-8">No shayaris yet.</p>
-        )}
+        {items.length === 0 && <p className="font-hand text-xl text-amber-200/40 text-center py-8">No shayaris yet.</p>}
       </div>
     </div>
   );

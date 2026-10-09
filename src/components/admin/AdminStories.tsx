@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, X, Save } from 'lucide-react';
 import { fetchStories, createStory, updateStory, deleteStory } from '@/lib/api';
 import type { Story } from '@/types';
 import { LoadingScreen } from '@/components/States';
+import { useToast } from '@/components/ToastProvider';
 
 export function AdminStories() {
   const [items, setItems] = useState<Story[]>([]);
@@ -10,16 +11,10 @@ export function AdminStories() {
   const [editing, setEditing] = useState<Story | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', excerpt: '', content: '', author: '', category: '', cover_url: '' });
+  const { toast } = useToast();
 
   const load = async () => {
-    try {
-      const data = await fetchStories();
-      setItems(data);
-    } catch {
-      // keep empty
-    } finally {
-      setLoading(false);
-    }
+    try { setItems(await fetchStories()); } catch { /* keep empty */ } finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, []);
@@ -33,12 +28,8 @@ export function AdminStories() {
   const openEdit = (item: Story) => {
     setEditing(item);
     setForm({
-      title: item.title,
-      excerpt: item.excerpt || '',
-      content: item.content,
-      author: item.author || '',
-      category: item.category || '',
-      cover_url: item.cover_url || '',
+      title: item.title, excerpt: item.excerpt || '', content: item.content,
+      author: item.author || '', category: item.category || '', cover_url: item.cover_url || '',
     });
     setShowForm(true);
   };
@@ -48,26 +39,20 @@ export function AdminStories() {
     if (!form.title.trim() || !form.content.trim()) return;
     try {
       const payload = {
-        title: form.title,
-        excerpt: form.excerpt || null,
-        content: form.content,
-        author: form.author || null,
-        category: form.category || null,
-        cover_url: form.cover_url || null,
+        title: form.title, excerpt: form.excerpt || null, content: form.content,
+        author: form.author || null, category: form.category || null, cover_url: form.cover_url || null,
       };
-      if (editing) {
-        await updateStory(editing.id, payload);
-      } else {
-        await createStory(payload);
-      }
-      setShowForm(false);
-      await load();
-    } catch { /* keep form open */ }
+      if (editing) { await updateStory(editing.id, payload); toast('Story updated.', 'success'); }
+      else { await createStory(payload); toast('Story created.', 'success'); }
+      setShowForm(false); await load();
+    } catch { toast('Could not save story.', 'error'); }
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this story?')) return;
-    try { await deleteStory(id); await load(); } catch { /* ignore */ }
+    try { await deleteStory(id); await load(); toast('Story deleted.', 'info'); } catch {
+      toast('Could not delete story.', 'error');
+    }
   };
 
   if (loading) return <LoadingScreen message="Loading stories..." />;

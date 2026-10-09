@@ -4,8 +4,9 @@ import { PenTool, ArrowLeft, Send } from 'lucide-react';
 import { fetchThoughts, createThought } from '@/lib/api';
 import type { Thought } from '@/types';
 import { LoadingScreen, ErrorScreen, EmptyState } from '@/components/States';
-import { Ornament } from '@/components/vintage/Ornament';
 import { OrnamentDark } from '@/components/vintage/Ornament';
+import { useToast } from '@/components/ToastProvider';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function Thoughts() {
   const [items, setItems] = useState<Thought[]>([]);
@@ -14,8 +15,8 @@ export default function Thoughts() {
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  const { toast } = useToast();
+  const ref = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     (async () => {
@@ -34,7 +35,6 @@ export default function Thoughts() {
     e.preventDefault();
     if (!content.trim()) return;
     setSubmitting(true);
-    setSubmitError('');
     try {
       const newThought = await createThought({
         content: content.trim(),
@@ -43,21 +43,20 @@ export default function Thoughts() {
       setItems([newThought, ...items]);
       setContent('');
       setAuthor('');
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 3000);
+      toast('Your thought has been shared. Thank you.', 'success');
     } catch {
-      setSubmitError('Could not share your thought. Please try again.');
+      toast('Could not share your thought. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
-            <PenTool className="w-8 h-8 text-amber-500" />
+            <PenTool className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
               Share Your Thoughts
             </h1>
@@ -69,7 +68,7 @@ export default function Thoughts() {
         </div>
 
         {/* Submit form */}
-        <div className="vintage-paper p-8 md:p-10 mb-10 relative">
+        <div className="vintage-paper p-8 md:p-10 mb-10 relative animate-scale-in">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <div className="vintage-ribbon">Write</div>
           </div>
@@ -99,14 +98,6 @@ export default function Thoughts() {
                 placeholder="Anonymous"
               />
             </div>
-            {submitError && (
-              <p className="font-body text-red-800 text-sm italic">{submitError}</p>
-            )}
-            {submitted && (
-              <p className="font-hand text-xl text-amber-700 italic">
-                Your thought has been shared. Thank you.
-              </p>
-            )}
             <button type="submit" disabled={submitting} className="vintage-btn">
               <Send className="w-4 h-4" />
               {submitting ? 'Sharing...' : 'Share Thought'}
@@ -116,10 +107,12 @@ export default function Thoughts() {
 
         {/* Shared thoughts */}
         <div>
-          <h2 className="font-display text-2xl text-amber-400 tracking-wide text-center mb-6">
-            Shared Reflections
-          </h2>
-          <OrnamentDark />
+          <div className="text-center mb-6 scroll-reveal">
+            <h2 className="font-display text-2xl text-amber-400 tracking-wide">
+              Shared Reflections
+            </h2>
+            <OrnamentDark />
+          </div>
 
           {loading ? (
             <LoadingScreen message="Gathering thoughts..." />
@@ -132,8 +125,8 @@ export default function Thoughts() {
               {items.map((item, i) => (
                 <div
                   key={item.id}
-                  className="vintage-paper-aged p-6 animate-fade-in-up relative"
-                  style={{ animationDelay: `${i * 80}ms`, opacity: 0 }}
+                  className="vintage-paper-aged p-6 scroll-reveal relative"
+                  style={{ transitionDelay: `${i * 80}ms` }}
                 >
                   <div className="absolute top-4 right-4">
                     <div className="w-10 h-10 rounded-full bg-amber-700/10 border border-amber-700/20 flex items-center justify-center">
@@ -161,7 +154,7 @@ export default function Thoughts() {
           )}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Link to="/" className="vintage-btn-outline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>

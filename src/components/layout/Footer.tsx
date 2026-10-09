@@ -4,8 +4,8 @@ import { OrnamentDark } from '@/components/vintage/Ornament';
 
 export function Footer() {
   return (
-    <footer className="vintage-wood-bg border-t-2 border-amber-800/40 mt-16">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
+    <footer className="vintage-wood-bg border-t-2 border-amber-800/40 mt-16 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
         <OrnamentDark />
         <div className="flex flex-col items-center text-center gap-4">
           <div className="flex items-center gap-2">
@@ -14,11 +14,11 @@ export function Footer() {
               ALFAZ
             </span>
           </div>
-          <p className="font-body text-amber-200/50 text-sm italic max-w-md">
+          <p className="font-serif-vintage text-xl text-amber-200/50 italic max-w-md leading-relaxed">
             "Words are the only thing that last forever. Empires crumble, cities fade,
             but alfaaz — alfaaz zinda rahenge."
           </p>
-          <div className="flex gap-6 mt-4">
+          <div className="flex flex-wrap gap-6 mt-4 justify-center">
             <Link to="/shayaris" className="font-display text-xs tracking-wider uppercase text-amber-200/50 hover:text-amber-400 transition-colors">
               Shayaris
             </Link>

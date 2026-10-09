@@ -7,18 +7,25 @@ import { LoadingScreen, ErrorScreen } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { WaxSeal } from '@/components/vintage/WaxSeal';
 import { Stamp } from '@/components/vintage/Stamp';
+import { Recommendations } from '@/components/Recommendations';
+import { getRecommendations, type Recommendation } from '@/lib/recommendations';
 
 export default function KhatDetail() {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<Khat | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
         const data = await fetchKhat(id!);
         setItem(data);
+        if (data) {
+          const recommendations = await getRecommendations('khat', id!, null, data.author);
+          setRecs(recommendations);
+        }
       } catch {
         setError(true);
       } finally {
@@ -31,28 +38,26 @@ export default function KhatDetail() {
   if (error || !item) return <ErrorScreen message="This letter could not be found" />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-3xl mx-auto">
         <Link to="/khats" className="vintage-btn-outline mb-8 inline-flex">
           <ArrowLeft className="w-4 h-4" /> All Khats
         </Link>
 
-        {/* Envelope outer */}
-        <div className="envelope p-10 md:p-14 relative animate-scale-in">
+        <div className="envelope p-10 md:p-14 relative animate-letter-slide">
           <div className="absolute top-6 right-6 flex flex-col items-center gap-3">
             <WaxSeal text="Unsent" />
             <Stamp>Postage</Stamp>
           </div>
 
           <div className="text-center mb-8">
-            <Mail className="w-8 h-8 text-amber-700/50 mx-auto mb-4" />
+            <Mail className="w-8 h-8 text-amber-700/50 mx-auto mb-4 animate-float" />
             <h1 className="font-display text-3xl text-stone-800 tracking-wide mb-2">
               {item.title}
             </h1>
             <Ornament />
           </div>
 
-          {/* Address block */}
           <div className="border border-amber-700/20 p-4 mb-6 bg-amber-50/30">
             {item.recipient && (
               <p className="font-hand text-xl text-stone-700">
@@ -68,7 +73,6 @@ export default function KhatDetail() {
             )}
           </div>
 
-          {/* Letter body */}
           <div className="font-body text-lg text-stone-700 leading-loose whitespace-pre-line italic">
             {item.content}
           </div>
@@ -83,6 +87,8 @@ export default function KhatDetail() {
             </p>
           </div>
         </div>
+
+        <Recommendations items={recs} />
       </div>
     </div>
   );

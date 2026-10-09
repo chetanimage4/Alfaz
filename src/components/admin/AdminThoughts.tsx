@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, X, Save } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { fetchThoughts, deleteThought } from '@/lib/api';
 import type { Thought } from '@/types';
 import { LoadingScreen } from '@/components/States';
+import { useToast } from '@/components/ToastProvider';
 
 export function AdminThoughts() {
   const [items, setItems] = useState<Thought[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const load = async () => {
     try { setItems(await fetchThoughts()); } catch { /* empty */ } finally { setLoading(false); }
@@ -16,7 +18,9 @@ export function AdminThoughts() {
 
   const remove = async (id: string) => {
     if (!confirm('Delete this thought?')) return;
-    try { await deleteThought(id); await load(); } catch { /* ignore */ }
+    try { await deleteThought(id); await load(); toast('Thought deleted.', 'info'); } catch {
+      toast('Could not delete thought.', 'error');
+    }
   };
 
   if (loading) return <LoadingScreen message="Loading thoughts..." />;

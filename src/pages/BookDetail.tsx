@@ -6,7 +6,8 @@ import type { Book, BookPage } from '@/types';
 import { LoadingScreen, ErrorScreen } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { Stamp } from '@/components/vintage/Stamp';
-import { Ribbon } from '@/components/vintage/Ribbon';
+import { Recommendations } from '@/components/Recommendations';
+import { getRecommendations, type Recommendation } from '@/lib/recommendations';
 
 export default function BookDetail() {
   const { id } = useParams<{ id: string }>();
@@ -14,16 +15,18 @@ export default function BookDetail() {
   const [pages, setPages] = useState<BookPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const [b, p] = await Promise.all([
-          fetchBook(id!),
-          fetchBookPages(id!),
-        ]);
+        const [b, p] = await Promise.all([fetchBook(id!), fetchBookPages(id!)]);
         setBook(b);
         setPages(p);
+        if (b) {
+          const recommendations = await getRecommendations('book', id!, b.genre, b.author);
+          setRecs(recommendations);
+        }
       } catch {
         setError(true);
       } finally {
@@ -43,22 +46,18 @@ export default function BookDetail() {
   }, {} as Record<string, BookPage[]>);
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-4xl mx-auto">
         <Link to="/books" className="vintage-btn-outline mb-8 inline-flex">
           <ArrowLeft className="w-4 h-4" /> The Library
         </Link>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {/* Book cover */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 animate-scale-in">
           <div className="md:col-span-1">
-            <div
-              className="relative aspect-[3/4] overflow-hidden"
+            <div className="relative aspect-[3/4] overflow-hidden book-spine-left"
               style={{
                 background: 'linear-gradient(135deg, #8b6b3a 0%, #6b4e2a 50%, #4a3520 100%)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3)',
                 border: '2px solid #4a3520',
-                borderRadius: '2px 6px 6px 2px',
               }}
             >
               {book.cover_url ? (
@@ -66,13 +65,10 @@ export default function BookDetail() {
                   src={book.cover_url}
                   alt={book.title}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               ) : null}
-              <div
-                className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
                 style={{ display: book.cover_url ? 'none' : 'flex' }}
               >
                 <BookOpen className="w-12 h-12 text-amber-200/40 mb-4" />
@@ -83,15 +79,13 @@ export default function BookDetail() {
                   <p className="font-hand text-lg text-amber-200/50 mt-2">{book.author}</p>
                 )}
               </div>
-              <div
-                className="absolute left-0 top-0 bottom-0 w-2"
+              <div className="absolute left-0 top-0 bottom-0 w-2"
                 style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 100%)' }}
               />
               <div className="absolute inset-2 border border-amber-500/20 pointer-events-none" />
             </div>
           </div>
 
-          {/* Book info */}
           <div className="md:col-span-2">
             <div className="vintage-paper p-8 h-full">
               <div className="flex items-start justify-between gap-2 mb-4">
@@ -132,7 +126,6 @@ export default function BookDetail() {
           </div>
         </div>
 
-        {/* Table of contents */}
         {pages.length > 0 && (
           <div className="vintage-paper-aged p-8">
             <div className="flex items-center gap-3 mb-4">
@@ -170,6 +163,8 @@ export default function BookDetail() {
             </div>
           </div>
         )}
+
+        <Recommendations items={recs} />
       </div>
     </div>
   );

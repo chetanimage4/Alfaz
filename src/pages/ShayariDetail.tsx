@@ -6,18 +6,25 @@ import type { Shayari } from '@/types';
 import { LoadingScreen, ErrorScreen } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { WaxSeal } from '@/components/vintage/WaxSeal';
+import { Recommendations } from '@/components/Recommendations';
+import { getRecommendations, type Recommendation } from '@/lib/recommendations';
 
 export default function ShayariDetail() {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<Shayari | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
         const data = await fetchShayari(id!);
         setItem(data);
+        if (data) {
+          const recommendations = await getRecommendations('shayari', id!, data.category, data.author);
+          setRecs(recommendations);
+        }
       } catch {
         setError(true);
       } finally {
@@ -30,19 +37,19 @@ export default function ShayariDetail() {
   if (error || !item) return <ErrorScreen message="This shayari could not be found" />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-3xl mx-auto">
         <Link to="/shayaris" className="vintage-btn-outline mb-8 inline-flex">
           <ArrowLeft className="w-4 h-4" /> All Shayaris
         </Link>
 
         <div className="vintage-paper p-10 md:p-14 relative animate-scale-in">
-          <div className="absolute top-6 right-6">
+          <div className="absolute top-6 right-6 animate-swing-slow" style={{ transformOrigin: 'top center' }}>
             <WaxSeal text="Verse" />
           </div>
 
           <div className="text-center mb-6">
-            <Feather className="w-8 h-8 text-amber-700/50 mx-auto mb-4" />
+            <Feather className="w-8 h-8 text-amber-700/50 mx-auto mb-4 animate-float" />
             {item.title && (
               <h1 className="font-display text-3xl md:text-4xl text-stone-800 tracking-wide mb-2">
                 {item.title}
@@ -77,6 +84,8 @@ export default function ShayariDetail() {
             </p>
           </div>
         </div>
+
+        <Recommendations items={recs} />
       </div>
     </div>
   );

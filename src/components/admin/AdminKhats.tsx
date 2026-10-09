@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2, X, Save } from 'lucide-react';
 import { fetchKhats, createKhat, updateKhat, deleteKhat } from '@/lib/api';
 import type { Khat } from '@/types';
 import { LoadingScreen } from '@/components/States';
+import { useToast } from '@/components/ToastProvider';
 
 export function AdminKhats() {
   const [items, setItems] = useState<Khat[]>([]);
@@ -10,6 +11,7 @@ export function AdminKhats() {
   const [editing, setEditing] = useState<Khat | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', content: '', author: '', recipient: '' });
+  const { toast } = useToast();
 
   const load = async () => {
     try { setItems(await fetchKhats()); } catch { /* empty */ } finally { setLoading(false); }
@@ -29,14 +31,17 @@ export function AdminKhats() {
     if (!form.title.trim() || !form.content.trim()) return;
     try {
       const payload = { title: form.title, content: form.content, author: form.author || null, recipient: form.recipient || null };
-      if (editing) await updateKhat(editing.id, payload); else await createKhat(payload);
+      if (editing) { await updateKhat(editing.id, payload); toast('Khat updated.', 'success'); }
+      else { await createKhat(payload); toast('Khat created.', 'success'); }
       setShowForm(false); await load();
-    } catch { /* keep */ }
+    } catch { toast('Could not save khat.', 'error'); }
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this khat?')) return;
-    try { await deleteKhat(id); await load(); } catch { /* ignore */ }
+    try { await deleteKhat(id); await load(); toast('Khat deleted.', 'info'); } catch {
+      toast('Could not delete khat.', 'error');
+    }
   };
 
   if (loading) return <LoadingScreen message="Loading khats..." />;

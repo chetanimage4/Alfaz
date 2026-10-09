@@ -6,12 +6,14 @@ import type { Shayari } from '@/types';
 import { LoadingScreen, ErrorScreen, EmptyState } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { Ribbon } from '@/components/vintage/Ribbon';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function Shayaris() {
   const [items, setItems] = useState<Shayari[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<string>('all');
+  const ref = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     (async () => {
@@ -34,11 +36,11 @@ export default function Shayaris() {
   const filtered = filter === 'all' ? items : items.filter((s) => s.category === filter);
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
-            <Feather className="w-8 h-8 text-amber-500" />
+            <Feather className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
               Shayaris
             </h1>
@@ -50,7 +52,7 @@ export default function Shayaris() {
         </div>
 
         {/* Category filters */}
-        <div className="flex flex-wrap gap-2 justify-center mb-8">
+        <div className="flex flex-wrap gap-2 justify-center mb-10 scroll-reveal">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -67,10 +69,10 @@ export default function Shayaris() {
             <Link
               key={item.id}
               to={`/shayaris/${item.id}`}
-              className="group animate-fade-in-up"
-              style={{ animationDelay: `${i * 80}ms`, opacity: 0 }}
+              className="group scroll-reveal"
+              style={{ transitionDelay: `${i * 60}ms` }}
             >
-              <div className="vintage-paper p-6 h-full transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl relative">
+              <div className="vintage-paper p-6 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl relative">
                 {item.category && (
                   <div className="absolute -top-3 left-4">
                     <Ribbon>{item.category}</Ribbon>
@@ -92,7 +94,7 @@ export default function Shayaris() {
                   ) : (
                     <span className="font-hand text-lg text-stone-500/50">Unknown</span>
                   )}
-                  <span className="text-amber-700 group-hover:translate-x-1 transition-transform">
+                  <span className="text-amber-700 group-hover:translate-x-2 transition-transform">
                     →
                   </span>
                 </div>
@@ -101,7 +103,7 @@ export default function Shayaris() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Link to="/" className="vintage-btn-outline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>

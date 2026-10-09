@@ -60,7 +60,7 @@ export default function BookReader() {
   if (pages.length === 0)
     return (
       <div className="min-h-screen vintage-wood-bg flex items-center justify-center">
-        <div className="vintage-paper p-10 text-center max-w-md">
+        <div className="vintage-paper p-10 text-center max-w-md animate-scale-in">
           <BookOpen className="w-12 h-12 text-amber-700/50 mx-auto mb-4" />
           <p className="font-serif-vintage text-xl text-stone-700 italic">
             This book has no pages yet.
@@ -73,7 +73,7 @@ export default function BookReader() {
     );
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-8 px-4 md:px-8">
+    <div className="min-h-screen vintage-wood-bg py-8 px-4 md:px-8 relative">
       <div className="max-w-4xl mx-auto">
         {/* Header bar */}
         <div className="flex items-center justify-between mb-6">
@@ -95,7 +95,6 @@ export default function BookReader() {
               turning ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
             }`}
           >
-            {/* Page number and chapter */}
             <div className="flex items-center justify-between mb-6">
               {page.chapter_title ? (
                 <span className="font-display text-xs tracking-wider uppercase text-amber-700/60">
@@ -109,26 +108,21 @@ export default function BookReader() {
               </span>
             </div>
 
-            {/* Page image */}
             {page.image_url && (
               <div className="mb-6 border border-amber-700/20 p-2 bg-amber-50/30">
                 <img
                   src={page.image_url}
                   alt={page.chapter_title || 'Page illustration'}
                   className="w-full max-h-64 object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).parentElement!.style.display = 'none';
-                  }}
+                  onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }}
                 />
               </div>
             )}
 
-            {/* Page content */}
             <div className="font-body text-lg md:text-xl text-stone-700 leading-loose whitespace-pre-line">
               {page.content || 'This page is empty.'}
             </div>
 
-            {/* Decorative bottom ornament */}
             <div className="mt-8 flex items-center justify-center gap-3">
               <div className="h-px bg-amber-700/20 w-12" />
               <div className="w-1.5 h-1.5 rotate-45 bg-amber-700/30" />
@@ -136,13 +130,10 @@ export default function BookReader() {
             </div>
           </div>
 
-          {/* Page turn shadow effect */}
           {turning && (
-            <div
-              className="absolute inset-0 pointer-events-none"
+            <div className="absolute inset-0 pointer-events-none"
               style={{
-                background:
-                  'linear-gradient(90deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.2) 100%)',
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.2) 100%)',
                 animation: 'fadeIn 0.3s ease-out',
               }}
             />

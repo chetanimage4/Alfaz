@@ -6,18 +6,25 @@ import type { Story } from '@/types';
 import { LoadingScreen, ErrorScreen } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { Stamp } from '@/components/vintage/Stamp';
+import { Recommendations } from '@/components/Recommendations';
+import { getRecommendations, type Recommendation } from '@/lib/recommendations';
 
 export default function StoryDetail() {
   const { id } = useParams<{ id: string }>();
   const [item, setItem] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
         const data = await fetchStory(id!);
         setItem(data);
+        if (data) {
+          const recommendations = await getRecommendations('story', id!, data.category, data.author);
+          setRecs(recommendations);
+        }
       } catch {
         setError(true);
       } finally {
@@ -30,7 +37,7 @@ export default function StoryDetail() {
   if (error || !item) return <ErrorScreen message="This story could not be found" />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-3xl mx-auto">
         <Link to="/stories" className="vintage-btn-outline mb-8 inline-flex">
           <ArrowLeft className="w-4 h-4" /> All Stories
@@ -38,7 +45,7 @@ export default function StoryDetail() {
 
         <div className="vintage-paper p-10 md:p-14 relative animate-scale-in">
           <div className="text-center mb-8">
-            <ScrollText className="w-10 h-10 text-amber-700/50 mx-auto mb-4" />
+            <ScrollText className="w-10 h-10 text-amber-700/50 mx-auto mb-4 animate-float" />
             <h1 className="font-display text-3xl md:text-4xl text-stone-800 tracking-wide mb-2">
               {item.title}
             </h1>
@@ -75,6 +82,8 @@ export default function StoryDetail() {
             </p>
           </div>
         </div>
+
+        <Recommendations items={recs} />
       </div>
     </div>
   );

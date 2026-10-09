@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
-import {
-  Plus, Pencil, Trash2, X, Save, ChevronUp, ChevronDown,
-  BookOpen, FileText, ArrowLeft,
-} from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Save, ChevronUp, ChevronDown, BookOpen, FileText, ArrowLeft } from 'lucide-react';
 import {
   fetchBooks, createBook, updateBook, deleteBook,
   fetchBookPages, createBookPage, updateBookPage, deleteBookPage,
 } from '@/lib/api';
 import type { Book, BookPage } from '@/types';
 import { LoadingScreen } from '@/components/States';
+import { useToast } from '@/components/ToastProvider';
 
 export function AdminBooks() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -19,6 +17,7 @@ export function AdminBooks() {
   const [form, setForm] = useState({
     title: '', author: '', description: '', about: '', cover_url: '', genre: '',
   });
+  const { toast } = useToast();
 
   const load = async () => {
     try { setBooks(await fetchBooks()); } catch { /* empty */ } finally { setLoading(false); }
@@ -35,12 +34,8 @@ export function AdminBooks() {
   const openEdit = (book: Book) => {
     setEditing(book);
     setForm({
-      title: book.title,
-      author: book.author || '',
-      description: book.description || '',
-      about: book.about || '',
-      cover_url: book.cover_url || '',
-      genre: book.genre || '',
+      title: book.title, author: book.author || '', description: book.description || '',
+      about: book.about || '', cover_url: book.cover_url || '', genre: book.genre || '',
     });
     setShowForm(true);
   };
@@ -50,30 +45,24 @@ export function AdminBooks() {
     if (!form.title.trim()) return;
     try {
       const payload = {
-        title: form.title,
-        author: form.author || null,
-        description: form.description || null,
-        about: form.about || null,
-        cover_url: form.cover_url || null,
-        genre: form.genre || null,
+        title: form.title, author: form.author || null, description: form.description || null,
+        about: form.about || null, cover_url: form.cover_url || null, genre: form.genre || null,
       };
-      if (editing) await updateBook(editing.id, payload);
-      else await createBook(payload);
-      setShowForm(false);
-      await load();
-    } catch { /* keep */ }
+      if (editing) { await updateBook(editing.id, payload); toast('Book updated.', 'success'); }
+      else { await createBook(payload); toast('Book created.', 'success'); }
+      setShowForm(false); await load();
+    } catch { toast('Could not save book.', 'error'); }
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this book and all its pages?')) return;
-    try { await deleteBook(id); await load(); } catch { /* ignore */ }
+    try { await deleteBook(id); await load(); toast('Book deleted.', 'info'); } catch {
+      toast('Could not delete book.', 'error');
+    }
   };
 
   if (loading) return <LoadingScreen message="Loading books..." />;
-
-  if (managingBook) {
-    return <BookPagesManager book={managingBook} onBack={() => setManagingBook(null)} />;
-  }
+  if (managingBook) return <BookPagesManager book={managingBook} onBack={() => setManagingBook(null)} />;
 
   return (
     <div>
@@ -148,6 +137,7 @@ function BookPagesManager({ book, onBack }: { book: Book; onBack: () => void }) 
   const [editing, setEditing] = useState<BookPage | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ chapter_title: '', page_number: 0, content: '', image_url: '' });
+  const { toast } = useToast();
 
   const load = async () => {
     try { setPages(await fetchBookPages(book.id)); } catch { /* empty */ } finally { setLoading(false); }
@@ -157,46 +147,31 @@ function BookPagesManager({ book, onBack }: { book: Book; onBack: () => void }) 
 
   const openNew = () => {
     setEditing(null);
-    setForm({
-      chapter_title: '',
-      page_number: pages.length > 0 ? Math.max(...pages.map((p) => p.page_number)) + 1 : 1,
-      content: '',
-      image_url: '',
-    });
+    setForm({ chapter_title: '', page_number: pages.length > 0 ? Math.max(...pages.map((p) => p.page_number)) + 1 : 1, content: '', image_url: '' });
     setShowForm(true);
   };
 
   const openEdit = (page: BookPage) => {
     setEditing(page);
-    setForm({
-      chapter_title: page.chapter_title || '',
-      page_number: page.page_number,
-      content: page.content || '',
-      image_url: page.image_url || '',
-    });
+    setForm({ chapter_title: page.chapter_title || '', page_number: page.page_number, content: page.content || '', image_url: page.image_url || '' });
     setShowForm(true);
   };
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload = {
-        book_id: book.id,
-        chapter_title: form.chapter_title || null,
-        page_number: form.page_number,
-        content: form.content || null,
-        image_url: form.image_url || null,
-      };
-      if (editing) await updateBookPage(editing.id, payload);
-      else await createBookPage(payload);
-      setShowForm(false);
-      await load();
-    } catch { /* keep */ }
+      const payload = { book_id: book.id, chapter_title: form.chapter_title || null, page_number: form.page_number, content: form.content || null, image_url: form.image_url || null };
+      if (editing) { await updateBookPage(editing.id, payload); toast('Page updated.', 'success'); }
+      else { await createBookPage(payload); toast('Page created.', 'success'); }
+      setShowForm(false); await load();
+    } catch { toast('Could not save page.', 'error'); }
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this page?')) return;
-    try { await deleteBookPage(id); await load(); } catch { /* ignore */ }
+    try { await deleteBookPage(id); await load(); toast('Page deleted.', 'info'); } catch {
+      toast('Could not delete page.', 'error');
+    }
   };
 
   const movePage = async (page: BookPage, direction: 'up' | 'down') => {
@@ -224,12 +199,8 @@ function BookPagesManager({ book, onBack }: { book: Book; onBack: () => void }) 
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="vintage-btn-outline">
-            <ArrowLeft className="w-4 h-4" /> Books
-          </button>
-          <h2 className="font-display text-xl text-amber-300 tracking-wide">
-            {book.title} — Pages ({pages.length})
-          </h2>
+          <button onClick={onBack} className="vintage-btn-outline"><ArrowLeft className="w-4 h-4" /> Books</button>
+          <h2 className="font-display text-xl text-amber-300 tracking-wide">{book.title} — Pages ({pages.length})</h2>
         </div>
         <button onClick={openNew} className="vintage-btn"><Plus className="w-4 h-4" /> Add Page</button>
       </div>
@@ -266,19 +237,11 @@ function BookPagesManager({ book, onBack }: { book: Book; onBack: () => void }) 
         {[...pages].sort((a, b) => a.page_number - b.page_number).map((page, idx, arr) => (
           <div key={page.id} className="vintage-paper p-4 flex items-start gap-3">
             <div className="flex flex-col gap-1 flex-shrink-0">
-              <button
-                onClick={() => movePage(page, 'up')}
-                disabled={idx === 0}
-                className={`text-amber-700 ${idx === 0 ? 'opacity-30' : 'hover:bg-amber-700/10'} p-1 transition-colors`}
-              >
+              <button onClick={() => movePage(page, 'up')} disabled={idx === 0} className={`text-amber-700 ${idx === 0 ? 'opacity-30' : 'hover:bg-amber-700/10'} p-1 transition-colors`}>
                 <ChevronUp className="w-4 h-4" />
               </button>
               <span className="font-display text-xs text-amber-700/60 text-center">{page.page_number}</span>
-              <button
-                onClick={() => movePage(page, 'down')}
-                disabled={idx === arr.length - 1}
-                className={`text-amber-700 ${idx === arr.length - 1 ? 'opacity-30' : 'hover:bg-amber-700/10'} p-1 transition-colors`}
-              >
+              <button onClick={() => movePage(page, 'down')} disabled={idx === arr.length - 1} className={`text-amber-700 ${idx === arr.length - 1 ? 'opacity-30' : 'hover:bg-amber-700/10'} p-1 transition-colors`}>
                 <ChevronDown className="w-4 h-4" />
               </button>
             </div>

@@ -6,11 +6,13 @@ import type { Book } from '@/types';
 import { LoadingScreen, ErrorScreen, EmptyState } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { Stamp } from '@/components/vintage/Stamp';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function Books() {
   const [items, setItems] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const ref = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     (async () => {
@@ -30,11 +32,11 @@ export default function Books() {
   if (items.length === 0) return <EmptyState message="The library shelves are empty." />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
-            <Library className="w-8 h-8 text-amber-500" />
+            <Library className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
               The Library
             </h1>
@@ -50,17 +52,14 @@ export default function Books() {
             <Link
               key={book.id}
               to={`/books/${book.id}`}
-              className="group animate-fade-in-up"
-              style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
+              className="group scroll-reveal"
+              style={{ transitionDelay: `${i * 100}ms` }}
             >
               <div className="flex flex-col h-full">
-                {/* Book cover */}
-                <div className="relative aspect-[3/4] overflow-hidden mb-4 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl"
+                <div className="relative aspect-[3/4] overflow-hidden mb-4 transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl book-spine-left"
                   style={{
                     background: 'linear-gradient(135deg, #8b6b3a 0%, #6b4e2a 50%, #4a3520 100%)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.3)',
                     border: '2px solid #4a3520',
-                    borderRadius: '2px 6px 6px 2px',
                   }}
                 >
                   {book.cover_url ? (
@@ -68,13 +67,10 @@ export default function Books() {
                       src={book.cover_url}
                       alt={book.title}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : null}
 
-                  {/* Cover overlay with title if no image */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
                     style={{ display: book.cover_url ? 'none' : 'flex' }}
                   >
@@ -89,16 +85,12 @@ export default function Books() {
                     )}
                   </div>
 
-                  {/* Spine effect */}
                   <div className="absolute left-0 top-0 bottom-0 w-2"
                     style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 100%)' }}
                   />
-
-                  {/* Gold border decoration */}
                   <div className="absolute inset-2 border border-amber-500/20 pointer-events-none" />
                 </div>
 
-                {/* Book info */}
                 <div className="vintage-paper p-4 flex-1 transition-all duration-500 group-hover:shadow-xl">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="font-display text-lg text-stone-800 tracking-wide leading-tight">
@@ -124,7 +116,7 @@ export default function Books() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Link to="/" className="vintage-btn-outline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>

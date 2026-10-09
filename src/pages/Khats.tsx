@@ -6,11 +6,13 @@ import type { Khat } from '@/types';
 import { LoadingScreen, ErrorScreen, EmptyState } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { WaxSeal } from '@/components/vintage/WaxSeal';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function Khats() {
   const [items, setItems] = useState<Khat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const ref = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     (async () => {
@@ -30,11 +32,11 @@ export default function Khats() {
   if (items.length === 0) return <EmptyState message="No letters yet. The drawer is empty." />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
-            <Mail className="w-8 h-8 text-amber-500" />
+            <Mail className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
               Unsent Khats
             </h1>
@@ -50,8 +52,8 @@ export default function Khats() {
             <Link
               key={item.id}
               to={`/khats/${item.id}`}
-              className="group animate-fade-in-up"
-              style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
+              className="group scroll-reveal"
+              style={{ transitionDelay: `${i * 80}ms` }}
             >
               <div className="envelope p-6 md:p-8 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-2xl relative">
                 <div className="flex items-start gap-4">
@@ -78,7 +80,7 @@ export default function Khats() {
                       {item.content}
                     </p>
                   </div>
-                  <span className="text-amber-700 group-hover:translate-x-1 transition-transform flex-shrink-0">
+                  <span className="text-amber-700 group-hover:translate-x-2 transition-transform flex-shrink-0">
                     →
                   </span>
                 </div>
@@ -87,7 +89,7 @@ export default function Khats() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Link to="/" className="vintage-btn-outline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>

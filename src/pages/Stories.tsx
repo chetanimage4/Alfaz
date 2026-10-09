@@ -6,11 +6,13 @@ import type { Story } from '@/types';
 import { LoadingScreen, ErrorScreen, EmptyState } from '@/components/States';
 import { Ornament } from '@/components/vintage/Ornament';
 import { Stamp } from '@/components/vintage/Stamp';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 export default function Stories() {
   const [items, setItems] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const ref = useScrollReveal<HTMLDivElement>();
 
   useEffect(() => {
     (async () => {
@@ -30,11 +32,11 @@ export default function Stories() {
   if (items.length === 0) return <EmptyState message="No stories yet. The book awaits its author." />;
 
   return (
-    <div className="min-h-screen vintage-wood-bg py-12 px-4 md:px-8">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
-            <ScrollText className="w-8 h-8 text-amber-500" />
+            <ScrollText className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
               Stories
             </h1>
@@ -50,10 +52,10 @@ export default function Stories() {
             <Link
               key={item.id}
               to={`/stories/${item.id}`}
-              className="group animate-fade-in-up"
-              style={{ animationDelay: `${i * 120}ms`, opacity: 0 }}
+              className="group scroll-reveal"
+              style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <div className="vintage-paper p-8 h-full transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl relative">
+              <div className="vintage-paper p-8 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl relative">
                 {item.category && (
                   <div className="absolute -top-3 right-6">
                     <Stamp>{item.category}</Stamp>
@@ -79,7 +81,7 @@ export default function Stories() {
                       year: 'numeric',
                     })}
                   </span>
-                  <span className="font-display text-xs tracking-wider uppercase text-amber-700 group-hover:translate-x-1 transition-transform">
+                  <span className="font-display text-xs tracking-wider uppercase text-amber-700 group-hover:translate-x-2 transition-transform">
                     Read →
                   </span>
                 </div>
@@ -88,7 +90,7 @@ export default function Stories() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Link to="/" className="vintage-btn-outline">
             <ArrowLeft className="w-4 h-4" /> Back to Home
           </Link>
