@@ -1,29 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [displayChildren, setDisplayChildren] = useState(children);
+  const previousPath = useRef(location.pathname);
   const [phase, setPhase] = useState<'idle' | 'billow-in' | 'billow-out'>('idle');
 
   useEffect(() => {
-    const currentPath = (children as React.ReactElement<{ location?: { pathname: string } }>)?.props?.location?.pathname;
-    if (location.pathname !== currentPath) {
-      setPhase('billow-in');
-      const swapTimer = setTimeout(() => {
-        setDisplayChildren(children);
-        setPhase('billow-out');
-      }, 500);
-      const doneTimer = setTimeout(() => setPhase('idle'), 900);
-      return () => { clearTimeout(swapTimer); clearTimeout(doneTimer); };
-    }
-  }, [location.pathname, children]);
+    if (location.pathname === previousPath.current) return;
+
+    previousPath.current = location.pathname;
+    setPhase('billow-in');
+    const revealTimer = setTimeout(() => setPhase('billow-out'), 500);
+    const doneTimer = setTimeout(() => setPhase('idle'), 900);
+
+    return () => {
+      clearTimeout(revealTimer);
+      clearTimeout(doneTimer);
+    };
+  }, [location.pathname]);
 
   return (
     <>
       {phase !== 'idle' && (
         <div className="fixed inset-0 z-[9999] pointer-events-none overflow-hidden">
-          {/* COC-style smoke clouds billowing across the screen */}
           <div
             className="absolute"
             style={{
@@ -33,12 +33,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           >
             <svg viewBox="0 0 1200 800" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
               <defs>
-                <filter id="transCloudBlur">
-                  <feGaussianBlur stdDeviation="40" />
-                </filter>
-                <filter id="transCloudBlur2">
-                  <feGaussianBlur stdDeviation="60" />
-                </filter>
+                <filter id="transCloudBlur"><feGaussianBlur stdDeviation="40" /></filter>
+                <filter id="transCloudBlur2"><feGaussianBlur stdDeviation="60" /></filter>
               </defs>
               <g filter="url(#transCloudBlur2)">
                 <ellipse cx="200" cy="300" rx="280" ry="200" fill="#1a1208" />
@@ -60,11 +56,8 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       )}
-      <div
-        key={location.pathname}
-        className={phase === 'billow-in' ? 'opacity-0' : 'animate-fade-in'}
-      >
-        {displayChildren}
+      <div className={phase === 'billow-in' ? 'opacity-0' : 'animate-fade-in'}>
+        {children}
       </div>
     </>
   );
