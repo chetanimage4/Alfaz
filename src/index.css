@@ -40,32 +40,117 @@
   .vintage-paper {
     background-color: #f4e8d0;
     background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(139,115,85,0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(139,115,85,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, rgba(139,115,85,0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 15% 45%, rgba(139,115,85,0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 25%, rgba(139,115,85,0.08) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 85%, rgba(160,120,70,0.12) 0%, transparent 55%),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
     color: var(--vintage-ink);
     box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 4px 20px rgba(0,0,0,0.2), inset 0 0 60px rgba(139,115,85,0.15);
   }
+
+  /* Asymmetric torn paper — irregular edges on all sides */
+  .torn-paper-a {
+    clip-path: polygon(
+      1% 3%, 5% 0%, 12% 2%, 18% 0%, 25% 3%, 32% 1%, 40% 0%, 48% 2%,
+      55% 0%, 63% 3%, 70% 1%, 78% 0%, 85% 2%, 92% 0%, 97% 3%, 100% 0%,
+      99% 8%, 100% 15%, 98% 22%, 100% 30%, 99% 38%, 100% 45%, 98% 52%,
+      100% 60%, 99% 68%, 100% 75%, 98% 82%, 100% 90%, 99% 96%, 97% 100%,
+      90% 98%, 83% 100%, 75% 97%, 68% 100%, 60% 98%, 52% 100%, 45% 98%,
+      38% 100%, 30% 97%, 22% 100%, 15% 98%, 8% 100%, 3% 97%, 0% 95%,
+      1% 88%, 0% 80%, 2% 72%, 0% 65%, 1% 58%, 0% 50%, 2% 42%, 0% 35%,
+      1% 28%, 0% 20%, 2% 12%, 0% 5%
+    );
+  }
+  .torn-paper-b {
+    clip-path: polygon(
+      0% 5%, 3% 1%, 8% 4%, 15% 0%, 22% 3%, 30% 1%, 38% 0%, 45% 2%,
+      52% 0%, 60% 3%, 68% 1%, 75% 0%, 82% 2%, 90% 0%, 96% 3%, 100% 1%,
+      98% 10%, 100% 18%, 97% 25%, 100% 35%, 98% 42%, 100% 50%, 97% 58%,
+      100% 65%, 98% 73%, 100% 82%, 97% 90%, 100% 97%, 95% 100%, 88% 98%,
+      80% 100%, 72% 97%, 65% 100%, 57% 98%, 48% 100%, 40% 97%, 32% 100%,
+      25% 98%, 18% 100%, 10% 97%, 4% 100%, 0% 96%, 2% 88%, 0% 78%,
+      3% 70%, 0% 60%, 2% 50%, 0% 40%, 3% 30%, 0% 20%, 2% 10%
+    );
+  }
+  .torn-paper-c {
+    clip-path: polygon(
+      2% 0%, 10% 3%, 20% 0%, 30% 2%, 40% 0%, 50% 3%, 60% 0%, 70% 2%,
+      80% 0%, 90% 3%, 98% 1%, 100% 8%, 97% 20%, 100% 35%, 98% 48%,
+      100% 62%, 97% 75%, 100% 88%, 98% 96%, 92% 100%, 80% 98%, 68% 100%,
+      55% 97%, 42% 100%, 28% 98%, 15% 100%, 5% 97%, 0% 90%, 3% 75%,
+      0% 60%, 2% 45%, 0% 30%, 3% 15%
+    );
+  }
+
+  /* Burnt edge effect — dark singed border on one or more sides */
+  .burnt-edges {
+    position: relative;
+  }
+  .burnt-edges::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    box-shadow:
+      inset 0 0 20px 6px rgba(60,30,10,0.25),
+      inset 0 0 50px 12px rgba(80,40,15,0.12);
+    mix-blend-mode: multiply;
+  }
+  .burnt-bottom::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30px;
+    pointer-events: none;
+    background: linear-gradient(0deg,
+      rgba(45,25,10,0.4) 0%, rgba(60,35,15,0.2) 40%, transparent 100%);
+    mix-blend-mode: multiply;
+  }
+  .burnt-top-left::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 60px;
+    pointer-events: none;
+    background: radial-gradient(ellipse at top left,
+      rgba(40,20,8,0.5) 0%, rgba(60,30,12,0.2) 40%, transparent 70%);
+    mix-blend-mode: multiply;
+  }
+  .burnt-corner-br::after {
+    content: ''; position: absolute; bottom: 0; right: 0; width: 80px; height: 80px;
+    pointer-events: none;
+    background: radial-gradient(ellipse at bottom right,
+      rgba(35,18,5,0.45) 0%, rgba(50,25,10,0.18) 45%, transparent 75%);
+    mix-blend-mode: multiply;
+  }
+
   .vintage-wood-bg {
     background-color: #1a1208;
     background-image:
-      repeating-linear-gradient(90deg, transparent 0px, rgba(60,40,20,0.15) 1px, transparent 2px, transparent 60px),
-      repeating-linear-gradient(0deg, transparent 0px, rgba(40,25,10,0.1) 1px, transparent 2px, transparent 120px),
+      repeating-linear-gradient(92deg, transparent 0px, rgba(60,40,20,0.12) 1px, transparent 3px, transparent 70px),
+      repeating-linear-gradient(2deg, transparent 0px, rgba(40,25,10,0.08) 1px, transparent 2px, transparent 130px),
+      radial-gradient(ellipse at 30% 20%, #2e2218 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, #241a10 0%, transparent 50%),
       radial-gradient(ellipse at center, #2a1f17 0%, #1a1208 100%);
   }
+
   .vintage-paper-aged {
-    background-color: #e8d9b8;
+    background-color: #e0d0a8;
     background-image:
-      radial-gradient(ellipse at 30% 40%, rgba(139,115,85,0.18) 0%, transparent 50%),
-      radial-gradient(ellipse at 70% 60%, rgba(139,115,85,0.12) 0%, transparent 50%),
-      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E");
+      radial-gradient(ellipse at 25% 35%, rgba(139,100,60,0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 75% 65%, rgba(160,120,70,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 90%, rgba(120,80,40,0.18) 0%, transparent 45%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
     color: var(--vintage-ink);
   }
+
+  /* Half-burnt paper — one corner visibly scorched */
+  .paper-half-burnt {
+    background-color: #e8d9b8;
+    background-image:
+      radial-gradient(ellipse at 20% 30%, rgba(139,115,85,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(80,40,15,0.3) 0%, rgba(60,30,10,0.15) 20%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+    color: var(--vintage-ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 0 60px rgba(139,115,85,0.15);
+  }
+
   .text-gold-gradient {
     background: linear-gradient(135deg, #d4af37 0%, #c9a84c 30%, #f0d97a 50%, #c9a84c 70%, #a88a2e 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
+
   .wax-seal {
     width: 60px; height: 60px; border-radius: 50%;
     background: radial-gradient(circle at 35% 35%, #c44 0%, #8b3a3a 60%, #6b2222 100%);
@@ -74,12 +159,14 @@
     color: #f4e8d0; font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.05em;
   }
+
   .vintage-ribbon {
     background: linear-gradient(135deg, #8b3a3a 0%, #6b2222 100%);
     color: #f4e8d0; padding: 6px 20px; font-family: 'Cinzel', serif; font-size: 0.75rem;
     letter-spacing: 0.1em; text-transform: uppercase; position: relative;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   }
+
   .vintage-btn {
     font-family: 'Cinzel', serif; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem;
     padding: 10px 24px; background: linear-gradient(135deg, #c9a84c 0%, #a88a2e 100%);
@@ -97,8 +184,7 @@
     display: inline-flex; align-items: center; gap: 8px;
   }
   .vintage-btn-outline:hover { background: rgba(201,168,76,0.15); box-shadow: 0 0 12px rgba(201,168,76,0.2); }
-  .torn-bottom { clip-path: polygon(0% 0%,100% 0%,100% 95%,97% 98%,93% 94%,88% 97%,83% 93%,78% 96%,73% 94%,68% 98%,63% 93%,58% 97%,53% 94%,48% 96%,43% 93%,38% 97%,33% 94%,28% 96%,23% 93%,18% 97%,13% 94%,8% 96%,3% 93%,0% 96%); }
-  .torn-top { clip-path: polygon(3% 4%,8% 2%,13% 5%,18% 3%,23% 6%,28% 3%,33% 5%,38% 2%,43% 6%,48% 3%,53% 5%,58% 2%,63% 6%,68% 3%,73% 5%,78% 2%,83% 6%,88% 3%,93% 5%,97% 2%,100% 4%,100% 100%,0% 100%); }
+
   .hanging-label {
     position: relative; display: inline-block; padding: 8px 24px;
     background: linear-gradient(135deg, #c9a84c 0%, #a88a2e 100%); color: #1a1208;
@@ -109,12 +195,14 @@
     content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
     width: 2px; height: 8px; background: #a88a2e;
   }
+
   .envelope {
     position: relative; background: #e8d9b8;
     background-image: radial-gradient(ellipse at 20% 80%, rgba(139,115,85,0.1) 0%, transparent 50%),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E");
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   }
+
   .old-tab {
     font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
     padding: 8px 20px; color: var(--vintage-sepia); border-bottom: 2px solid transparent;
@@ -122,16 +210,19 @@
   }
   .old-tab:hover { color: var(--vintage-gold); }
   .old-tab-active { color: var(--vintage-gold); border-bottom-color: var(--vintage-gold); }
+
   .vintage-stamp {
     border: 2px dashed var(--vintage-gold-dark); padding: 4px 12px; font-family: 'Cinzel', serif;
     font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--vintage-gold-dark);
     transform: rotate(-3deg); display: inline-block;
   }
+
   .vintage-input {
     background: rgba(244,232,208,0.95); border: 1px solid var(--vintage-gold-dark); color: var(--vintage-ink);
     padding: 10px 14px; font-family: 'Crimson Text', serif; font-size: 1rem; width: 100%; transition: all 0.3s ease;
   }
   .vintage-input:focus { outline: none; border-color: var(--vintage-gold); box-shadow: 0 0 8px rgba(201,168,76,0.3); }
+
   .vintage-textarea {
     background: rgba(244,232,208,0.95); border: 1px solid var(--vintage-gold-dark); color: var(--vintage-ink);
     padding: 12px 16px; font-family: 'Crimson Text', serif; font-size: 1rem; width: 100%;
@@ -139,26 +230,13 @@
   }
   .vintage-textarea:focus { outline: none; border-color: var(--vintage-gold); box-shadow: 0 0 8px rgba(201,168,76,0.3); }
 
-  /* Organic blob shapes */
-  .blob-1 { clip-path: polygon(20% 0%, 80% 5%, 100% 30%, 95% 70%, 75% 100%, 30% 95%, 0% 75%, 5% 30%); }
-  .blob-2 { clip-path: polygon(50% 0%, 90% 15%, 100% 50%, 85% 90%, 50% 100%, 15% 85%, 0% 50%, 10% 15%); }
-  .blob-3 { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; }
-  .blob-4 { border-radius: 40% 60% 70% 30% / 50% 40% 60% 50%; }
-
-  /* Half-rounded book shape */
   .book-spine-left {
     border-radius: 4px 16px 16px 4px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.3);
   }
 
-  /* Folded letter */
   .folded-letter {
     clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 15%, 50% 50%, 0% 85%);
-  }
-
-  /* Torn paper card */
-  .torn-card {
-    clip-path: polygon(0% 2%, 3% 0%, 10% 3%, 20% 0%, 35% 2%, 50% 0%, 65% 3%, 80% 0%, 95% 2%, 100% 0%, 98% 10%, 100% 25%, 97% 50%, 100% 75%, 98% 90%, 100% 100%, 90% 98%, 75% 100%, 60% 97%, 45% 100%, 30% 98%, 15% 100%, 5% 97%, 0% 95%);
   }
 }
 
@@ -170,7 +248,6 @@
   .text-shadow-vintage { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 20px rgba(201,168,76,0.15); }
   .text-shadow-paper { text-shadow: 1px 1px 0 rgba(139,115,85,0.2); }
 
-  @keyframes curtainOpen { 0% { transform: scaleY(100%); } 100% { transform: scaleY(0%); } }
   @keyframes swing { 0%,100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
   @keyframes swingSlow { 0%,100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
   @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
@@ -180,17 +257,37 @@
   @keyframes flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.85; } 25% { opacity: 0.95; } 75% { opacity: 0.9; } }
   @keyframes pageTurn { 0% { transform: rotateY(0deg); opacity: 1; } 49% { transform: rotateY(-90deg); opacity: 0.5; } 50% { transform: rotateY(90deg); opacity: 0.5; } 100% { transform: rotateY(0deg); opacity: 1; } }
 
-  /* New animations */
-  @keyframes driftSlow {
+  /* COC-style cloud drift — large slow billowing movement */
+  @keyframes cloudDrift1 {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(40px, -30px) scale(1.05); }
-    66% { transform: translate(-30px, 20px) scale(0.95); }
+    25% { transform: translate(60px, -20px) scale(1.08); }
+    50% { transform: translate(120px, 10px) scale(1.15); }
+    75% { transform: translate(60px, 30px) scale(1.05); }
   }
-  @keyframes driftReverse {
+  @keyframes cloudDrift2 {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(-40px, 30px) scale(1.1); }
-    66% { transform: translate(30px, -20px) scale(0.9); }
+    33% { transform: translate(-80px, 25px) scale(1.1); }
+    66% { transform: translate(-40px, -35px) scale(0.92); }
   }
+  @keyframes cloudDrift3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    30% { transform: translate(50px, 40px) scale(1.12); }
+    60% { transform: translate(-30px, -20px) scale(0.95); }
+    90% { transform: translate(20px, 15px) scale(1.03); }
+  }
+  @keyframes cloudBillow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+  }
+
+  /* Smoke puff transition — clouds billowing in then out */
+  @keyframes smokeBillowIn {
+    0% { opacity: 0; transform: scale(0.3) translateX(-30%); filter: blur(20px); }
+    40% { opacity: 1; transform: scale(1.2) translateX(0%); filter: blur(0px); }
+    60% { opacity: 1; transform: scale(1.1) translateX(5%); filter: blur(2px); }
+    100% { opacity: 0; transform: scale(1.3) translateX(30%); filter: blur(20px); }
+  }
+
   @keyframes reveal {
     from { opacity: 0; transform: translateY(30px) rotate(-1deg); }
     to { opacity: 1; transform: translateY(0) rotate(0deg); }
@@ -207,25 +304,20 @@
     from { opacity: 1; transform: translateX(0) scale(1); }
     to { opacity: 0; transform: translateX(120%) scale(0.8); }
   }
-  @keyframes toastProgress {
-    from { width: 100%; }
-    to { width: 0%; }
-  }
+  @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
   @keyframes letterSlide {
     from { opacity: 0; transform: translateY(40px) rotate(-2deg); }
     to { opacity: 1; transform: translateY(0) rotate(0deg); }
   }
-  @keyframes gentleRotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
+  @keyframes gentleRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 5px rgba(201,168,76,0.3); }
-    50% { box-shadow: 0 0 20px rgba(201,168,76,0.5); }
+    0%, 100% { filter: drop-shadow(0 4px 12px rgba(201,168,76,0.3)); }
+    50% { filter: drop-shadow(0 4px 20px rgba(201,168,76,0.5)); }
   }
-  @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes emberGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
   }
 
   .animate-swing { animation: swing 4s ease-in-out infinite; transform-origin: top center; }
@@ -236,8 +328,6 @@
   .animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
   .animate-flicker { animation: flicker 3s ease-in-out infinite; }
   .animate-page-turn { animation: pageTurn 0.8s ease-in-out; }
-  .animate-drift-slow { animation: driftSlow 20s ease-in-out infinite; }
-  .animate-drift-reverse { animation: driftReverse 25s ease-in-out infinite; }
   .animate-reveal { animation: reveal 0.7s ease-out forwards; }
   .animate-text-blur-in { animation: textBlurIn 0.8s ease-out forwards; }
   .animate-toast-in { animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
@@ -245,13 +335,18 @@
   .animate-toast-progress { animation: toastProgress 4s linear forwards; }
   .animate-letter-slide { animation: letterSlide 0.6s ease-out forwards; }
   .animate-gentle-rotate { animation: gentleRotate 30s linear infinite; }
-  .animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+  .animate-ember-glow { animation: emberGlow 3s ease-in-out infinite; }
+
+  .animate-cloud-1 { animation: cloudDrift1 30s ease-in-out infinite; }
+  .animate-cloud-2 { animation: cloudDrift2 35s ease-in-out infinite; }
+  .animate-cloud-3 { animation: cloudDrift3 28s ease-in-out infinite; }
+  .animate-cloud-billow { animation: cloudBillow 8s ease-in-out infinite; }
 
   .perspective-1000 { perspective: 1000px; }
   .preserve-3d { transform-style: preserve-3d; }
   .backface-hidden { backface-visibility: hidden; }
 
-  /* Scroll reveal */
   .scroll-reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -260,14 +355,6 @@
   .scroll-reveal.visible {
     opacity: 1;
     transform: translateY(0);
-  }
-
-  .smoke-overlay {
-    position: fixed; inset: 0; z-index: 9999; pointer-events: none;
-    background:
-      radial-gradient(circle at 30% 50%, rgba(40,30,20,0.9) 0%, transparent 60%),
-      radial-gradient(circle at 70% 50%, rgba(50,35,25,0.9) 0%, transparent 60%),
-      radial-gradient(circle at 50% 30%, rgba(30,20,15,0.85) 0%, transparent 50%);
   }
 
   ::-webkit-scrollbar { width: 10px; }
