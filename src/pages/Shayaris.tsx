@@ -8,6 +8,10 @@ import { Ornament } from '@/components/vintage/Ornament';
 import { Ribbon } from '@/components/vintage/Ribbon';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
+function formatPoetry(value: string) {
+  return value.replace(/\\n/g, '\n');
+}
+
 export default function Shayaris() {
   const [items, setItems] = useState<Shayari[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,9 +40,9 @@ export default function Shayaris() {
   const filtered = filter === 'all' ? items : items.filter((s) => s.category === filter);
 
   return (
-    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
+    <div ref={ref} className="min-h-screen vintage-wood-bg shayaris-page py-16 px-4 md:px-8 relative">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10 animate-text-blur-in">
+        <div className="text-center mb-12 animate-text-blur-in shayaris-heading">
           <div className="inline-flex items-center gap-3 mb-2">
             <Feather className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
@@ -52,7 +56,7 @@ export default function Shayaris() {
         </div>
 
         {/* Category filters */}
-        <div className="flex flex-wrap gap-2 justify-center mb-10 scroll-reveal">
+        <div className="shayari-filters flex flex-wrap gap-2 justify-center mb-12 scroll-reveal">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -64,7 +68,7 @@ export default function Shayaris() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="shayari-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
           {filtered.map((item, i) => (
             <Link
               key={item.id}
@@ -72,7 +76,7 @@ export default function Shayaris() {
               className="group scroll-reveal"
               style={{ transitionDelay: `${i * 60}ms` }}
             >
-              <div className="vintage-paper p-6 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl relative">
+              <div className="shayari-card vintage-paper torn-paper-a p-7 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:shadow-2xl relative">
                 {item.category && (
                   <div className="absolute -top-3 left-4">
                     <Ribbon>{item.category}</Ribbon>
@@ -83,8 +87,8 @@ export default function Shayaris() {
                     {item.title}
                   </h3>
                 )}
-                <p className="font-serif-vintage text-lg text-stone-700 italic leading-relaxed whitespace-pre-line line-clamp-6">
-                  {item.content}
+                <p className="shayari-content poetry-text font-serif-vintage text-lg text-stone-700 italic leading-relaxed line-clamp-6">
+                  {formatPoetry(item.content)}
                 </p>
                 <div className="mt-4 pt-3 border-t border-amber-700/20 flex items-center justify-between">
                   {item.author ? (
