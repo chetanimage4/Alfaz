@@ -19,7 +19,7 @@ export function FloatingNav() {
     <>
       {/* Floating hanging nav buttons — desktop */}
       <div className="hidden md:flex fixed top-0 left-0 right-0 z-50 justify-center pointer-events-none">
-        <div className="flex items-start gap-3 pt-2 pointer-events-auto">
+        <div className="flex items-start gap-2 pt-1 pointer-events-auto">
           {navItems.map((item, i) => {
             const Icon = item.icon;
             const active = location.pathname === item.to ||
@@ -30,7 +30,7 @@ export function FloatingNav() {
                 <div className="w-px h-6 bg-gradient-to-b from-transparent to-amber-700/50" />
                 <Link
                   to={item.to}
-                  className="group flex flex-col items-center gap-1 px-4 py-2 transition-all duration-300 hover:-translate-y-1"
+                  className="group flex flex-col items-center gap-1 px-3 py-2 transition-all duration-300 hover:-translate-y-1"
                   style={{
                     transform: `rotate(${item.angle}deg)`,
                     animation: `swing ${4 + i}s ease-in-out infinite`,
@@ -38,7 +38,7 @@ export function FloatingNav() {
                     transformOrigin: 'top center',
                   }}
                 >
-                  <div className={`flex items-center gap-1.5 px-3 py-1.5 border transition-all duration-300 ${
+                  <div className={`flex items-center gap-1.5 rounded-sm px-3 py-2 border border-t-0 transition-all duration-300 ${
                     active
                       ? 'bg-amber-900/40 border-amber-500/60 shadow-lg shadow-amber-900/30'
                       : 'bg-stone-900/70 border-amber-800/30 hover:border-amber-600/50 backdrop-blur-sm'

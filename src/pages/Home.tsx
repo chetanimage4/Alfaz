@@ -7,10 +7,9 @@ import {
   Library,
   PenTool,
   Settings,
-  BookOpen,
-  Sparkles,
-  Flame,
   Quote,
+  ArrowUpRight,
+  Sparkles,
 } from 'lucide-react';
 import { OrnamentDark } from '@/components/vintage/Ornament';
 import { HangingLabel } from '@/components/vintage/HangingLabel';
@@ -18,7 +17,12 @@ import { fetchShayaris, fetchStories, fetchKhats, fetchBooks } from '@/lib/api';
 import type { Shayari } from '@/types';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
-const tornShapes = ['torn-paper-a', 'torn-paper-b', 'torn-paper-c'];
+const collectionShapes = ['torn-paper-a', 'torn-paper-b', 'torn-paper-c', 'torn-paper-b', 'torn-paper-a', 'torn-paper-c'];
+const collectionStyles = ['collection-card-ink', 'collection-card-wine', 'collection-card-letter', 'collection-card-library', 'collection-card-quiet'];
+
+function formatPoetry(value: string) {
+  return value.replace(/\\n/g, '\n');
+}
 
 export default function Home() {
   const [counts, setCounts] = useState({ shayaris: 0, stories: 0, khats: 0, books: 0 });
@@ -28,196 +32,132 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const [s, st, k, b] = await Promise.all([
+        const [shayaris, stories, khats, books] = await Promise.all([
           fetchShayaris(), fetchStories(), fetchKhats(), fetchBooks(),
         ]);
-        setCounts({ shayaris: s.length, stories: st.length, khats: k.length, books: b.length });
-        setFeaturedShayaris(s.slice(0, 3));
-      } catch { /* counts stay 0 */ }
+        setCounts({ shayaris: shayaris.length, stories: stories.length, khats: khats.length, books: books.length });
+        setFeaturedShayaris(shayaris.slice(0, 3));
+      } catch {
+        setCounts({ shayaris: 0, stories: 0, khats: 0, books: 0 });
+      }
     })();
   }, []);
 
   const sections = [
-    { to: '/shayaris', label: 'Shayaris', desc: 'Verses that breathe in the silence between words', icon: Feather, count: counts.shayaris },
-    { to: '/stories', label: 'Stories', desc: 'Tales woven from the fabric of memory and time', icon: ScrollText, count: counts.stories },
-    { to: '/khats', label: 'Unsent Khats', desc: 'Letters that were folded but never delivered', icon: Mail, count: counts.khats },
-    { to: '/books', label: 'Books', desc: 'A library where every page carries the weight of years', icon: Library, count: counts.books },
-    { to: '/thoughts', label: 'Thoughts', desc: 'Share what your heart whispers in quiet moments', icon: PenTool, count: 0 },
+    { to: '/shayaris', label: 'Shayaris', kicker: 'The verse room', desc: 'Verses that breathe in the silence between words.', icon: Feather, count: counts.shayaris },
+    { to: '/stories', label: 'Stories', kicker: 'The long shelf', desc: 'Tales woven from the fabric of memory and time.', icon: ScrollText, count: counts.stories },
+    { to: '/khats', label: 'Unsent Khats', kicker: 'The writing desk', desc: 'Letters folded, sealed, and never delivered.', icon: Mail, count: counts.khats },
+    { to: '/books', label: 'Books', kicker: 'The library', desc: 'A library where every page carries the weight of years.', icon: Library, count: counts.books },
+    { to: '/thoughts', label: 'Thoughts', kicker: 'The margins', desc: 'Small truths whispered in the quiet between chapters.', icon: PenTool, count: 0 },
   ];
 
   return (
     <div ref={ref} className="min-h-screen vintage-wood-bg relative overflow-hidden">
-      {/* Top dark gradient with curtain tassels */}
-      <div className="absolute top-0 left-0 right-0 h-32 pointer-events-none z-10">
-        <div className="absolute top-0 left-0 w-full h-full"
-          style={{ background: 'linear-gradient(180deg, rgba(60,20,15,0.9) 0%, rgba(40,15,10,0.5) 60%, transparent 100%)' }}
-        />
-        {[12, 28, 44, 60, 76, 92].map((pos, i) => (
-          <div key={pos} className="absolute animate-swing" style={{ left: `${pos}%`, top: 0, transformOrigin: 'top center', animationDelay: `${i * 0.3}s` }}>
-            <div className="w-0.5 h-10 bg-gradient-to-b from-amber-700/30 to-transparent" />
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-600/20 mx-auto -mt-0.5" />
+      <section className="theatre-stage relative z-20 px-5 pt-24 pb-16 md:px-10 md:pt-28 md:pb-24">
+        <div className="velvet-curtain velvet-curtain-left" aria-hidden="true" />
+        <div className="velvet-curtain velvet-curtain-right" aria-hidden="true" />
+        <div className="stage-warmth" aria-hidden="true" />
+        <div className="stage-threads" aria-hidden="true" />
+
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <div className="mb-12 flex items-center justify-between border-y border-amber-700/20 py-3 text-[0.62rem] uppercase tracking-[0.3em] text-amber-200/45">
+            <span>Vol. I · The house of words</span>
+            <span className="hidden sm:inline">An archive of feeling</span>
+            <span>Est. in the quiet</span>
           </div>
-        ))}
-      </div>
 
-      {/* Hanging tags — asymmetric positions */}
-      <div className="absolute top-6 left-6 md:left-16 z-20 animate-swing-slow" style={{ transformOrigin: 'top center' }}>
-        <div className="w-0.5 h-14 bg-amber-800/30" />
-        <div className="vintage-ribbon text-xs">Est. Today</div>
-      </div>
-      <div className="absolute top-10 right-8 md:right-20 z-20 animate-swing" style={{ transformOrigin: 'top center', animationDelay: '1s' }}>
-        <div className="w-0.5 h-20 bg-amber-800/30" />
-        <div className="vintage-ribbon text-xs">Literary</div>
-      </div>
-
-      {/* Hero — offset, asymmetric layout */}
-      <section className="relative z-20 min-h-[90vh] flex flex-col items-center justify-center px-4 pt-20 pb-8">
-        {/* Ember glow behind title */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-20 blur-3xl animate-ember-glow pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(201,168,76,0.3) 0%, transparent 70%)' }}
-        />
-
-        <div className="text-center max-w-4xl animate-text-blur-in relative">
-          <p className="font-hand text-amber-500/50 text-2xl md:text-3xl mb-3">
-            Welcome to the world of
-          </p>
-          <h1 className="font-display text-6xl md:text-8xl lg:text-[10rem] text-gold-gradient font-bold tracking-wider mb-2 text-shadow-vintage animate-pulse-glow leading-none">
-            ALFAZ
-          </h1>
-          <p className="font-serif-vintage text-xl md:text-2xl text-amber-200/50 italic tracking-[0.3em] mb-6">
-            ٱلفاظ
-          </p>
-          <OrnamentDark className="my-4" />
-          <p className="font-body text-base md:text-lg text-amber-100/40 max-w-xl mx-auto leading-relaxed">
-            Step into an old library where shayaris echo through dusty shelves,
-            stories wait in yellowed pages, and unsent letters rest in forgotten
-            drawers. Here, every word is a relic — and every relic, a world.
-          </p>
-        </div>
-
-        {/* Featured shayari — rotated, torn, half-burnt card */}
-        {featuredShayaris.length > 0 && (
-          <div className="mt-10 max-w-xl animate-scale-in">
-            <div className="paper-half-burnt torn-paper-b burnt-edges p-8 md:p-10 relative animate-float" style={{ transform: 'rotate(-1.5deg)' }}>
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                <HangingLabel>Today's Verse</HangingLabel>
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.82fr] lg:gap-20">
+            <div className="animate-text-blur-in">
+              <p className="mb-4 font-hand text-2xl text-amber-400/75 md:text-3xl">Welcome to the world of</p>
+              <h1 className="font-display text-6xl font-semibold leading-[0.86] tracking-[0.08em] text-gold-gradient text-shadow-vintage sm:text-8xl lg:text-[8.5rem]">
+                ALFAZ
+              </h1>
+              <div className="mt-5 flex items-center gap-4">
+                <span className="h-px w-14 bg-amber-500/60" />
+                <p className="font-serif-vintage text-2xl italic tracking-[0.25em] text-amber-100/75">ٱلفاظ</p>
+                <span className="h-px w-14 bg-amber-500/60" />
               </div>
-              <Quote className="absolute top-6 left-6 w-8 h-8 text-amber-700/15" />
-              {featuredShayaris[0].title && (
-                <h3 className="font-display text-lg text-amber-800 text-center mb-3 tracking-wider">
-                  {featuredShayaris[0].title}
-                </h3>
-              )}
-              <p className="font-serif-vintage text-xl md:text-2xl text-stone-800 italic text-center leading-relaxed whitespace-pre-line">
-                {featuredShayaris[0].content}
+              <p className="mt-7 max-w-xl font-body text-lg leading-relaxed text-amber-50/70 md:text-xl">
+                An old library for new feelings — where shayaris echo through dusty shelves,
+                stories wait in yellowed pages, and every word becomes a relic.
               </p>
-              {featuredShayaris[0].author && (
-                <p className="font-hand text-xl text-amber-700/60 text-right mt-4">
-                  — {featuredShayaris[0].author}
-                </p>
-              )}
-              {/* Burnt corner accent */}
-              <div className="absolute bottom-0 right-0 w-12 h-12 pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse at bottom right, rgba(30,15,5,0.4) 0%, transparent 70%)' }}
-              />
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/shayaris" className="vintage-btn"><Feather className="h-4 w-4" /> Read the verses</Link>
+                <Link to="/books" className="vintage-btn-outline">Enter the library <ArrowUpRight className="h-4 w-4" /></Link>
+              </div>
             </div>
-          </div>
-        )}
 
-        <div className="mt-8 flex flex-wrap gap-3 justify-center animate-fade-in">
-          <Link to="/shayaris" className="vintage-btn">
-            <Feather className="w-4 h-4" /> Read Shayaris
-          </Link>
-          <Link to="/books" className="vintage-btn-outline">
-            <Library className="w-4 h-4" /> Browse Books
-          </Link>
+            {featuredShayaris.length > 0 && (
+              <div className="relative animate-scale-in lg:pt-8">
+                <div className="verse-shadow" aria-hidden="true" />
+                <article className="today-verse torn-paper-b burnt-edges relative px-7 py-10 sm:px-10 sm:py-12">
+                  <HangingLabel>Today's shayari</HangingLabel>
+                  <Quote className="absolute right-6 top-7 h-10 w-10 rotate-180 text-amber-800/15" />
+                  <p className="mb-5 font-display text-[0.65rem] uppercase tracking-[0.28em] text-amber-800/70">From the newest page</p>
+                  {featuredShayaris[0].title && (
+                    <h2 className="mb-4 font-serif-vintage text-2xl font-semibold text-stone-800 sm:text-3xl">
+                      {featuredShayaris[0].title}
+                    </h2>
+                  )}
+                  <p className="poetry-text font-serif-vintage text-xl italic leading-[1.7] text-stone-800 sm:text-2xl">
+                    {formatPoetry(featuredShayaris[0].content)}
+                  </p>
+                  {featuredShayaris[0].author && (
+                    <p className="mt-7 border-t border-amber-800/20 pt-4 text-right font-hand text-2xl text-amber-800/75">
+                      — {featuredShayaris[0].author}
+                    </p>
+                  )}
+                  <div className="absolute bottom-4 left-7 h-px w-16 bg-amber-800/30" />
+                </article>
+                <span className="absolute -bottom-5 -left-3 rotate-[-8deg] font-hand text-xl text-amber-100/45">a page worth keeping</span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Collection — asymmetric scattered grid with torn, burnt cards */}
-      <section className="relative z-20 px-4 md:px-8 pb-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 scroll-reveal">
-            <div className="inline-flex items-center gap-2 mb-2">
-              <Flame className="w-5 h-5 text-amber-500/60 animate-ember-glow" />
-              <h2 className="font-display text-3xl md:text-4xl text-amber-400 tracking-wider">
-                The Collection
-              </h2>
-              <Flame className="w-5 h-5 text-amber-500/60 animate-ember-glow" style={{ animationDelay: '1.5s' }} />
+      <section className="relative z-20 px-5 pb-20 pt-12 md:px-10 md:pt-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 flex flex-col items-start justify-between gap-4 border-b border-amber-700/25 pb-6 sm:flex-row sm:items-end">
+            <div className="scroll-reveal">
+              <p className="mb-2 font-display text-[0.65rem] uppercase tracking-[0.3em] text-amber-500/75">A living archive</p>
+              <h2 className="font-serif-vintage text-4xl font-semibold text-amber-100/90 md:text-5xl">The Collection</h2>
             </div>
-            <OrnamentDark />
+            <p className="max-w-xs font-body text-base italic leading-relaxed text-amber-100/50 sm:text-right">
+              Five rooms. Countless voices. Take the long way through.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {sections.map((section, i) => {
+          <div className="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
+            {sections.map((section, index) => {
               const Icon = section.icon;
-              const shape = tornShapes[i % 3];
-              const rotation = i % 2 === 0 ? '-1deg' : '1.5deg';
               return (
-                <Link
-                  key={section.to}
-                  to={section.to}
-                  className="group scroll-reveal"
-                  style={{ transitionDelay: `${i * 80}ms` }}
-                >
-                  <div
-                    className={`vintage-paper ${shape} burnt-edges p-7 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:rotate-0 group-hover:shadow-2xl relative overflow-hidden`}
-                    style={{ transform: `rotate(${rotation})` }}
-                  >
-                    <div className="absolute top-0 right-0 w-28 h-28 opacity-10 group-hover:opacity-25 group-hover:rotate-12 transition-all duration-700">
-                      <Icon className="w-full h-full text-amber-800" />
-                    </div>
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="w-11 h-11 flex items-center justify-center bg-amber-900/10 border border-amber-700/25 group-hover:bg-amber-900/20 group-hover:border-amber-600/50 transition-all duration-300">
-                        <Icon className="w-5 h-5 text-amber-700" />
+                <Link key={section.to} to={section.to} className="group scroll-reveal" style={{ transitionDelay: `${index * 80}ms` }}>
+                  <div className={`collection-card ${collectionStyles[index] ?? collectionStyles[0]} ${collectionShapes[index]} relative h-full min-h-[245px] overflow-hidden p-7`}>
+                    <div className="card-engraving" aria-hidden="true"><Icon /></div>
+                    <div className="relative z-10 flex h-full flex-col">
+                      <div className="mb-7 flex items-start justify-between">
+                        <span className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-900/60">0{index + 1} / {section.kicker}</span>
+                        <Icon className="h-5 w-5 text-amber-800/65 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
                       </div>
-                      <div>
-                        <h3 className="font-display text-lg text-stone-800 tracking-wide">
-                          {section.label}
-                        </h3>
-                        {section.count > 0 && (
-                          <span className="font-hand text-base text-amber-700/50">
-                            {section.count} {section.count === 1 ? 'entry' : 'entries'}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="font-body text-sm text-stone-600 italic leading-relaxed">
-                      {section.desc}
-                    </p>
-                    <div className="mt-4 flex items-center gap-2 text-amber-700 group-hover:gap-4 transition-all duration-300">
-                      <span className="font-display text-xs tracking-wider uppercase">Enter</span>
-                      <span className="text-amber-700">→</span>
+                      <h3 className="font-serif-vintage text-3xl font-semibold text-stone-800">{section.label}</h3>
+                      {section.count > 0 && <span className="mt-1 font-hand text-lg text-amber-800/65">{section.count} {section.count === 1 ? 'entry' : 'entries'}</span>}
+                      <p className="mt-auto max-w-[18rem] pt-6 font-body text-lg italic leading-relaxed text-stone-700/85">{section.desc}</p>
+                      <span className="mt-5 flex items-center gap-2 font-display text-[0.65rem] uppercase tracking-[0.2em] text-amber-800 transition-all group-hover:gap-4">Open room <ArrowUpRight className="h-4 w-4" /></span>
                     </div>
                   </div>
                 </Link>
               );
             })}
 
-            {/* Admin card — more burnt, aged */}
             <Link to="/admin" className="group scroll-reveal" style={{ transitionDelay: '400ms' }}>
-              <div
-                className="vintage-paper-aged torn-paper-c burnt-corner-br p-7 h-full transition-all duration-500 group-hover:-translate-y-3 group-hover:rotate-0 group-hover:shadow-2xl relative overflow-hidden"
-                style={{ transform: 'rotate(-1deg)' }}
-              >
-                <div className="absolute top-0 right-0 w-28 h-28 opacity-10 group-hover:opacity-25 group-hover:rotate-12 transition-all duration-700">
-                  <Settings className="w-full h-full text-amber-800" />
-                </div>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-11 h-11 flex items-center justify-center bg-amber-900/10 border border-amber-700/25 group-hover:bg-amber-900/20 group-hover:border-amber-600/50 transition-all duration-300">
-                    <Settings className="w-5 h-5 text-amber-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-lg text-stone-800 tracking-wide">Admin Panel</h3>
-                    <span className="font-hand text-base text-amber-700/50">Manage content</span>
-                  </div>
-                </div>
-                <p className="font-body text-sm text-stone-600 italic leading-relaxed">
-                  Add, edit, and curate the collection. The keeper's quarters.
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-amber-700 group-hover:gap-4 transition-all duration-300">
-                  <span className="font-display text-xs tracking-wider uppercase">Enter</span>
-                  <span className="text-amber-700">→</span>
+              <div className="collection-card collection-card-admin torn-paper-c relative h-full min-h-[245px] overflow-hidden p-7">
+                <div className="card-engraving" aria-hidden="true"><Settings /></div>
+                <div className="relative z-10 flex h-full flex-col">
+                  <div className="mb-7 flex items-start justify-between"><span className="font-display text-[0.62rem] uppercase tracking-[0.24em] text-amber-100/50">06 / The keeper's desk</span><Settings className="h-5 w-5 text-amber-200/65 transition-transform duration-500 group-hover:rotate-45" /></div>
+                  <h3 className="font-serif-vintage text-3xl font-semibold text-amber-50">Admin Panel</h3>
+                  <p className="mt-auto max-w-[18rem] pt-6 font-body text-lg italic leading-relaxed text-amber-50/65">Add, edit, and curate the collection from the keeper's desk.</p>
+                  <span className="mt-5 flex items-center gap-2 font-display text-[0.65rem] uppercase tracking-[0.2em] text-amber-300 transition-all group-hover:gap-4">Enter quietly <ArrowUpRight className="h-4 w-4" /></span>
                 </div>
               </div>
             </Link>
@@ -225,68 +165,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Verses of the day — staggered, asymmetric */}
       {featuredShayaris.length > 1 && (
-        <section className="relative z-20 px-4 md:px-8 pb-16">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-8 scroll-reveal">
-              <div className="inline-flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-500/50" />
-                <h2 className="font-display text-2xl md:text-3xl text-amber-400 tracking-wide">
-                  Verses of the Day
-                </h2>
-                <Sparkles className="w-4 h-4 text-amber-500/50" />
-              </div>
-              <OrnamentDark />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {featuredShayaris.slice(1).map((shayari, i) => {
-                const shape = tornShapes[(i + 1) % 3];
-                const rotation = i % 2 === 0 ? '2deg' : '-1.5deg';
-                return (
-                  <Link
-                    key={shayari.id}
-                    to={`/shayaris/${shayari.id}`}
-                    className="group scroll-reveal"
-                    style={{ transitionDelay: `${i * 120}ms` }}
-                  >
-                    <div
-                      className={`paper-half-burnt ${shape} burnt-edges p-6 h-full transition-all duration-500 group-hover:-translate-y-2 group-hover:rotate-0 group-hover:shadow-xl relative`}
-                      style={{ transform: `rotate(${rotation})` }}
-                    >
-                      {shayari.title && (
-                        <h3 className="font-display text-base text-amber-800 tracking-wide mb-2">
-                          {shayari.title}
-                        </h3>
-                      )}
-                      <p className="font-serif-vintage text-lg text-stone-700 italic leading-relaxed line-clamp-4 whitespace-pre-line">
-                        {shayari.content}
-                      </p>
-                      {shayari.author && (
-                        <p className="font-hand text-lg text-amber-700/50 mt-3">
-                          — {shayari.author}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                );
-              })}
+        <section className="relative z-20 px-5 pb-24 md:px-10">
+          <div className="mx-auto max-w-5xl border-t border-amber-700/20 pt-14">
+            <div className="mb-9 text-center scroll-reveal"><Sparkles className="mx-auto mb-3 h-4 w-4 text-amber-500/65" /><h2 className="font-serif-vintage text-3xl text-amber-100/85 md:text-4xl">More from the reading room</h2><OrnamentDark /></div>
+            <div className="grid gap-8 md:grid-cols-2">
+              {featuredShayaris.slice(1).map((shayari, index) => (
+                <Link key={shayari.id} to={`/shayaris/${shayari.id}`} className="group scroll-reveal" style={{ transitionDelay: `${index * 120}ms` }}>
+                  <article className={`paper-half-burnt ${collectionShapes[index + 1]} burnt-edges relative h-full p-7 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl`} style={{ transform: `rotate(${index === 0 ? '1.2deg' : '-1.2deg'})` }}>
+                    {shayari.title && <h3 className="mb-3 font-serif-vintage text-2xl text-stone-800">{shayari.title}</h3>}
+                    <p className="poetry-text font-serif-vintage text-xl italic leading-relaxed text-stone-700">{formatPoetry(shayari.content)}</p>
+                    {shayari.author && <p className="mt-4 text-right font-hand text-xl text-amber-700/65">— {shayari.author}</p>}
+                  </article>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
       )}
-
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-10">
-        <div className="absolute bottom-0 left-0 w-full h-full"
-          style={{ background: 'linear-gradient(0deg, rgba(60,20,15,0.9) 0%, transparent 100%)' }}
-        />
-      </div>
-
-      {/* Floating book icon — decorative */}
-      <div className="absolute bottom-24 right-6 md:right-16 opacity-[0.08] pointer-events-none animate-float">
-        <BookOpen className="w-24 h-24 text-amber-600/40" />
-      </div>
     </div>
   );
 }
