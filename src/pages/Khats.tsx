@@ -32,9 +32,9 @@ export default function Khats() {
   if (items.length === 0) return <EmptyState message="No letters yet. The drawer is empty." />;
 
   return (
-    <div ref={ref} className="min-h-screen vintage-wood-bg khats-page py-16 px-4 md:px-8 relative">
+    <div ref={ref} className="min-h-screen vintage-wood-bg py-16 px-4 md:px-8 relative">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12 animate-text-blur-in khats-heading">
+        <div className="text-center mb-10 animate-text-blur-in">
           <div className="inline-flex items-center gap-3 mb-2">
             <Mail className="w-8 h-8 text-amber-500 animate-float" />
             <h1 className="font-display text-4xl md:text-5xl text-gold-gradient tracking-wider">
@@ -47,7 +47,7 @@ export default function Khats() {
           <Ornament />
         </div>
 
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {items.map((item, i) => (
             <Link
               key={item.id}
@@ -55,8 +55,8 @@ export default function Khats() {
               className="group scroll-reveal"
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className="envelope khat-letter p-7 md:p-9 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl relative">
-                <div className="khat-letter-body flex items-start gap-5">
+              <div className="envelope p-6 md:p-8 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-2xl relative">
+                <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <WaxSeal text="Unsent" />
                   </div>
@@ -64,7 +64,7 @@ export default function Khats() {
                     <h3 className="font-display text-xl text-stone-800 tracking-wide mb-1">
                       {item.title}
                     </h3>
-                    <div className="khat-meta flex flex-wrap items-center gap-x-4 gap-y-1 mb-4">
+                    <div className="flex items-center gap-3 mb-3">
                       {item.author && (
                         <span className="font-hand text-lg text-amber-700/70">
                           From: {item.author}
@@ -76,7 +76,7 @@ export default function Khats() {
                         </span>
                       )}
                     </div>
-                    <p className="khat-content font-serif-vintage text-stone-700 italic leading-relaxed line-clamp-3">
+                    <p className="font-body text-stone-600 italic leading-relaxed line-clamp-3">
                       {item.content}
                     </p>
                   </div>
